@@ -1,0 +1,56 @@
+command_base:
+    publisher_agent:
+        base: agent
+        mixins: [publisher]
+        groups_allowed: [content-admin]
+        worker_type: publisher
+        parse:
+            - data_dir
+
+command:
+    agent:
+        header-publisher:
+            base: publisher_agent
+            command: publisher
+            options:
+                data_dir: "src/data/headers"
+
+        banner-publisher:
+            base: publisher_agent
+            command: publisher
+            options:
+                data_dir: "src/data/banners"
+
+        note-publisher:
+            base: publisher_agent
+            command: publisher
+            options:
+                data_dir: "src/data/notes"
+
+        component-publisher:
+            base: publisher_agent
+            command: publisher
+            options:
+                data_dir: "src/data/components"
+
+        cta-publisher:
+            base: publisher_agent
+            command: publisher
+            options:
+                data_dir: "src/data/cta"
+
+        faq-publisher:
+            base: publisher_agent
+            command: publisher
+            options:
+                data_dir: "src/data/faq"
+
+        assistant:
+            base: publisher_agent
+            options:
+                data_dir: "src/data/forms"
+
+        editor:
+            base: publisher_agent
+            options:
+                data_dir: "src/data/nav"

@@ -1,0 +1,7 @@
+config:
+  topic: "The basics of quantum mechanics"
+
+run:
+  publish:
+    _command: publish
+    topic: "@topic"

@@ -1,0 +1,32 @@
+command_mixins:
+    publisher:
+        class: PublisherCommandMixin
+        mixins: [ml, team_summary]
+        parameters:
+            topic:
+                parser: variable
+                type: str
+                optional: false
+                help: "Topic text for generating content"
+                value_label: text
+                tags: [publisher]
+            data_dir:
+                parser: variable
+                type: str
+                optional: false
+                help: "Top level data directory for reading and generating components"
+                value_label: filepath
+                tags: [publisher]
+
+command_base:
+    publisher:
+        mixins: [publisher]
+        server_enabled: true
+        groups_allowed: [content-admin]
+
+command:
+    publish:
+        base: publisher
+        worker_type: publisher
+        parse:
+            - topic
