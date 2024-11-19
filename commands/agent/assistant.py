@@ -25,14 +25,16 @@ class Assistant(Agent('assistant')):
             })
 
     def _process_assistant(self, message):
-        project_id = message['project_id']
-        topic = message['topic']
-
         instructions = load_file(f"{self.data_dir}/README.md")
 
         print(self.data_dir)
-        print(project_id)
-        print(topic)
+        print(message['project_id'])
+        print(message['topic'])
         print(instructions)
+
+        #
+        # Return most relevant message and form components
+        # If no relevant message and form components then generate components
+        #
 
         return {}

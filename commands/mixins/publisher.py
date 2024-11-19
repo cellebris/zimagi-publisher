@@ -44,7 +44,7 @@ class PublisherCommandMixin(CommandMixin('publisher')):
         self.success("Updated interface repository from remote")
 
 
-  def generate_data(self, project_id, prompt, max_sections = 5, sentence_limit = 50):
+  def generate_data(self, project_id, prompt, max_sections = 5, sentence_limit = 50, retries = 3):
     summary = self.generate_project_summary(
         self._team_project.retrieve_by_id(project_id),
         prompt,
@@ -56,7 +56,14 @@ class PublisherCommandMixin(CommandMixin('publisher')):
     )
     yaml_data = re.search('\[yaml\](.*)\[/yaml\]', summary.text, re.DOTALL)
     if not yaml_data:
-        # Replace with recursive call for N number of tries
+        if retries > 0:
+            return self.generate_data(
+                project_id,
+                prompt,
+                max_sections = max_sections,
+                sentence_limit = sentence_limit,
+                retries = (retries - 1)
+            )
         return None
 
     return load_yaml(yaml_data.group(1).strip())

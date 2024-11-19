@@ -25,17 +25,14 @@ class Editor(Agent('editor')):
             })
 
     def _edit_page(self, message):
-        project_id = message['project_id']
-        topic = message['topic']
-
         instructions = load_file(f"{self.data_dir}/README.md")
 
         print(self.data_dir)
-        print(project_id)
-        print(topic)
+        print(message['project_id'])
+        print(message['topic'])
         print(instructions)
 
-        for component in self.collect('agent:publish', message, timeout = 30, quantity = 10):
-            print(component)
+        for metadata in self.collect('agent:publish', message, timeout = 180, quantity = 10):
+            print(metadata)
 
         return {}

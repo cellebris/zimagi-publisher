@@ -1,0 +1,98 @@
+data_mixins:
+  form_submission:
+    class: FormSubmissionMixin
+    fields:
+      form_submission:
+        type: '@django.ForeignKey'
+        relation: form_submission
+        options:
+          on_delete: '@django.CASCADE'
+  form_submission_optional:
+    class: FormSubmissionOptionalMixin
+    fields:
+      form_submission:
+        type: '@django.ForeignKey'
+        relation: form_submission
+        options:
+          on_delete: '@django.SET_NULL'
+          'null': true
+  form_submissions:
+    class: FormSubmissionMultipleMixin
+    fields:
+      form_submissions:
+        type: '@django.ManyToManyField'
+        relation: form_submission
+        options:
+          blank: true
+data_base:
+  form_submission:
+    class: FormSubmissionBase
+    base: id_resource
+    mixins:
+    - form_submission
+    id_fields:
+    - form_submission_id
+    - name
+    meta:
+      unique_together:
+      - form_submission
+      - name
+      scope: form_submission
+data:
+  form_submission:
+    class: FormSubmission
+    base: id_resource
+    id_fields:
+    - external_id
+    - portal_name
+    key: id
+    api: true
+    display: <portal_name>:<external_id>
+    roles:
+      edit:
+      - data-admin
+      view:
+      - data-auditor
+    fields:
+      portal_name:
+        type: '@django.CharField'
+        options:
+          'null': true
+          default: null
+          choices: null
+          max_length: 256
+          editable: true
+          primary_key: false
+          system: false
+      name:
+        type: '@django.CharField'
+        options:
+          'null': true
+          default: null
+          choices: null
+          max_length: 256
+          editable: true
+          primary_key: false
+          system: false
+      external_id:
+        type: '@django.CharField'
+        options:
+          'null': true
+          default: null
+          choices: null
+          max_length: 256
+          editable: true
+          primary_key: false
+          system: false
+      fields:
+        type: '@zimagi.DictionaryField'
+        color: json
+        options:
+          editable: true
+          system: false
+    meta:
+      unique_together:
+      - external_id
+      - portal_name
+      ordering:
+      - id

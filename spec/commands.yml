@@ -1,7 +1,7 @@
 command_mixins:
     publisher:
         class: PublisherCommandMixin
-        mixins: [ml, team_summary]
+        mixins: [ml, team_summary, form_submission]
         parameters:
             topic:
                 parser: variable
@@ -25,6 +25,13 @@ command_base:
         groups_allowed: [content-admin]
 
 command:
+    portal:
+        event:
+            form_submission:
+                base: portal_event
+                mixins: [publisher]
+                worker_type: publisher
+
     publish:
         base: publisher
         worker_type: publisher

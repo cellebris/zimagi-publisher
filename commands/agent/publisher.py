@@ -25,14 +25,27 @@ class Publisher(Agent('publisher')):
             })
 
     def _publish_component(self, message):
-        project_id = message['project_id']
-        topic = message['topic']
-
         instructions = load_file(f"{self.data_dir}/README.md")
 
         print(self.data_dir)
-        print(project_id)
-        print(topic)
+        print(message['project_id'])
+        print(message['topic'])
         print(instructions)
 
-        return {}
+        #
+        # Return most relevant component
+        # If no relevant components then generate component
+        #
+
+        #
+        # Prompt should combine:
+        #
+        # 1. instructions
+        # 2. topic
+        #
+        return self.generate_data(
+            message['project_id'],
+            f"Generate a web component for '{message['topic']}' using the following instructions: {instructions}",
+            max_sections = message.get('max_sections', 5),
+            sentence_limit = message.get('sentence_limit', 50)
+        )
