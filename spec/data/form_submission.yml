@@ -64,7 +64,7 @@ data:
           editable: true
           primary_key: false
           system: false
-      name:
+      session_id:
         type: '@django.CharField'
         options:
           'null': true
@@ -89,6 +89,16 @@ data:
         color: json
         options:
           editable: true
+          system: false
+      name:
+        type: '@django.CharField'
+        options:
+          'null': true
+          default: null
+          choices: null
+          max_length: 256
+          editable: true
+          primary_key: false
           system: false
     meta:
       unique_together:

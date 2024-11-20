@@ -18,6 +18,8 @@ models:
                 type: string
             external_id:
                 type: string
+            session_id:
+                type: string
             name:
                 type: string
             fields:
