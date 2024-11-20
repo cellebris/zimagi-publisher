@@ -20,6 +20,7 @@ class FormSubmission(Command('portal.event.form_submission')):
             self.save_instance(self._form_submission, None, {
                 'portal_name': self.portal,
                 'external_id': event.id,
+                'session_id': event.session_id,
                 'name': event.name,
                 'fields': event.fields,
             })
