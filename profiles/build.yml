@@ -16,11 +16,23 @@ models:
         fields:
             portal_name:
                 type: string
+                options:
+                    max_length: 100
             external_id:
                 type: string
+                options:
+                    max_length: 50
             session_id:
                 type: string
+                options:
+                    max_length: 50
+            path:
+                type: string
+                options:
+                    max_length: 1024
             name:
                 type: string
+                options:
+                    max_length: 255
             fields:
                 type: dict

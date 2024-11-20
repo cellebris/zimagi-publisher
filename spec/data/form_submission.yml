@@ -60,7 +60,7 @@ data:
           'null': true
           default: null
           choices: null
-          max_length: 256
+          max_length: 100
           editable: true
           primary_key: false
           system: false
@@ -70,17 +70,17 @@ data:
           'null': true
           default: null
           choices: null
-          max_length: 256
+          max_length: 50
           editable: true
           primary_key: false
           system: false
-      external_id:
+      name:
         type: '@django.CharField'
         options:
           'null': true
           default: null
           choices: null
-          max_length: 256
+          max_length: 255
           editable: true
           primary_key: false
           system: false
@@ -90,13 +90,23 @@ data:
         options:
           editable: true
           system: false
-      name:
+      external_id:
         type: '@django.CharField'
         options:
           'null': true
           default: null
           choices: null
-          max_length: 256
+          max_length: 50
+          editable: true
+          primary_key: false
+          system: false
+      path:
+        type: '@django.CharField'
+        options:
+          'null': true
+          default: null
+          choices: null
+          max_length: 1024
           editable: true
           primary_key: false
           system: false

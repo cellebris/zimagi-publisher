@@ -21,6 +21,7 @@ class FormSubmission(Command('portal.event.form_submission')):
                 'portal_name': self.portal,
                 'external_id': event.id,
                 'session_id': event.session_id,
+                'path': event.path,
                 'name': event.name,
                 'fields': event.fields,
             })
