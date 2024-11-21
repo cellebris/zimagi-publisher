@@ -48,8 +48,8 @@ class PublisherCommandMixin(CommandMixin('publisher')):
         self._team_project.retrieve_by_id(project_id),
         prompt,
         use_default_format = True,
-        output_format = 'Generate the response in YAML between [yaml] and [/yaml] tags.',
-        output_endings = ['[/yaml]'],
+        output_format = 'Generate the response in YAML between [yaml] and [/yaml] tags and end the response with [/end].',
+        output_endings = ['[/end]'],
         max_sections = max_sections,
         sentence_limit = sentence_limit
     )

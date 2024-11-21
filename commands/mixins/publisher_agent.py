@@ -1,8 +1,5 @@
-from django.conf import settings
-
 from systems.commands.index import CommandMixin
 from utility.filesystem import load_file
-from utility.data import load_yaml
 
 
 class PublisherAgentCommandMixin(CommandMixin('publisher_agent')):
@@ -31,8 +28,7 @@ class PublisherAgentCommandMixin(CommandMixin('publisher_agent')):
         instructions = load_file(f"{self.data_dir}/README.md")
 
         print(self.data_dir)
-        print(message['project_id'])
-        print(message['topic'])
+        print(message)
         print(instructions)
 
         #
@@ -46,9 +42,10 @@ class PublisherAgentCommandMixin(CommandMixin('publisher_agent')):
         # 1. instructions
         # 2. topic
         #
-        return self.generate_data(
-            message['project_id'],
-            f"Generate a web component for '{message['topic']}' using the following instructions: {instructions}",
-            max_sections = message.get('max_sections', 5),
-            sentence_limit = message.get('sentence_limit', 50)
-        )
+        return {}
+        # return self.generate_data(
+        #     message['project_id'],
+        #     f"Generate a web component for '{message['topic']}' using the following instructions: {instructions}",
+        #     max_sections = message.get('max_sections', 5),
+        #     sentence_limit = message.get('sentence_limit', 50)
+        # )
