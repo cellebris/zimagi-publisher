@@ -90,6 +90,12 @@ data:
         options:
           editable: true
           system: false
+      page:
+        type: '@zimagi.DictionaryField'
+        color: json
+        options:
+          editable: true
+          system: false
       external_id:
         type: '@django.CharField'
         options:
@@ -101,6 +107,16 @@ data:
           primary_key: false
           system: false
       path:
+        type: '@django.CharField'
+        options:
+          'null': true
+          default: null
+          choices: null
+          max_length: 1024
+          editable: true
+          primary_key: false
+          system: false
+      nav_path:
         type: '@django.CharField'
         options:
           'null': true

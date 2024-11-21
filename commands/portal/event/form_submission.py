@@ -24,6 +24,8 @@ class FormSubmission(Command('portal.event.form_submission')):
                 'path': event.path,
                 'name': event.name,
                 'fields': event.fields,
+                'nav_path': event.nav_path,
+                'page': event.page
             })
             self.send('agent:form_submissions:update', event.export())
             self.success("Successfully updated form submission: {}".format(event.id))
