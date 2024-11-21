@@ -1,8 +1,11 @@
-from systems.commands.index import Agent
+from django.conf import settings
+
+from systems.commands.index import CommandMixin
 from utility.filesystem import load_file
+from utility.data import load_yaml
 
 
-class Publisher(Agent('publisher')):
+class PublisherAgentCommandMixin(CommandMixin('publisher_agent')):
 
     def exec(self):
         input_channel = 'agent:publish'

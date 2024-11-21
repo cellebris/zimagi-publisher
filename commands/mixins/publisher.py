@@ -9,15 +9,6 @@ import re
 
 class PublisherCommandMixin(CommandMixin('publisher')):
 
-  def _git_auth(self):
-    return {
-      'username': settings.INTERFACE_REPO_USER,
-      'password': settings.INTERFACE_REPO_PASSWORD,
-      'public_key': settings.INTERFACE_REPO_PUBLIC_KEY,
-      'private_key': settings.INTERFACE_REPO_PRIVATE_KEY
-    }
-
-
   def sync_interface(self):
     is_repository = Git.check(settings.MANAGER.publisher_interface)
 
@@ -42,6 +33,14 @@ class PublisherCommandMixin(CommandMixin('publisher')):
             branch = settings.INTERFACE_REPO_REFERENCE
         )
         self.success("Updated interface repository from remote")
+
+  def _git_auth(self):
+    return {
+      'username': settings.INTERFACE_REPO_USER,
+      'password': settings.INTERFACE_REPO_PASSWORD,
+      'public_key': settings.INTERFACE_REPO_PUBLIC_KEY,
+      'private_key': settings.INTERFACE_REPO_PRIVATE_KEY
+    }
 
 
   def generate_data(self, project_id, prompt, max_sections = 5, sentence_limit = 50, retries = 3):
