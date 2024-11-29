@@ -33,6 +33,12 @@ command:
                 options:
                     data_dir: "src/data/notes"
 
+            stats:
+                base: publisher_agent
+                mixins: [publisher_agent]
+                options:
+                    data_dir: "src/data/stats"
+
             component:
                 base: publisher_agent
                 mixins: [publisher_agent]

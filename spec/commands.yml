@@ -32,6 +32,11 @@ command:
                 mixins: [publisher]
                 worker_type: publisher
 
+            form_embedding:
+                base: portal_event
+                mixins: [publisher]
+                worker_type: publisher
+
     publish:
         base: publisher
         worker_type: publisher

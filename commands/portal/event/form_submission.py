@@ -14,7 +14,10 @@ class FormSubmission(Command('portal.event.form_submission')):
                 external_id = event.id
             ).delete()
 
-            self.send('agent:form_submissions:delete', event.export())
+            self.send('agent:form_submissions:delete', {
+                'portal_name': self.portal,
+                **event.export()
+            })
             self.success("Successfully deleted form submission: {}".format(event.id))
         else:
             self.save_instance(self._form_submission, None, {
@@ -27,5 +30,8 @@ class FormSubmission(Command('portal.event.form_submission')):
                 'nav_path': event.nav_path,
                 'page': event.page
             })
-            self.send('agent:form_submissions:update', event.export())
+            self.send('agent:form_submissions:update', {
+                'portal_name': self.portal,
+                **event.export()
+            })
             self.success("Successfully updated form submission: {}".format(event.id))
