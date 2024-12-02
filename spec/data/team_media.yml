@@ -1,134 +1,118 @@
 data_mixins:
-  form_submission:
-    class: FormSubmissionMixin
+  team_media:
+    class: TeamMediaMixin
     fields:
-      form_submission:
+      team_media:
         type: '@django.ForeignKey'
-        relation: form_submission
+        relation: team_media
         options:
           on_delete: '@django.CASCADE'
-  form_submission_optional:
-    class: FormSubmissionOptionalMixin
+  team_media_optional:
+    class: TeamMediaOptionalMixin
     fields:
-      form_submission:
+      team_media:
         type: '@django.ForeignKey'
-        relation: form_submission
+        relation: team_media
         options:
           on_delete: '@django.SET_NULL'
           'null': true
-  form_submissions:
-    class: FormSubmissionMultipleMixin
+  team_medias:
+    class: TeamMediaMultipleMixin
     fields:
-      form_submissions:
+      team_medias:
         type: '@django.ManyToManyField'
-        relation: form_submission
+        relation: team_media
         options:
           blank: true
 data_base:
-  form_submission:
-    class: FormSubmissionBase
+  team_media:
+    class: TeamMediaBase
     base: id_resource
     mixins:
-    - form_submission
+    - team_media
     id_fields:
-    - form_submission_id
+    - team_media_id
     - name
     meta:
       unique_together:
-      - form_submission
+      - team_media
       - name
-      scope: form_submission
+      scope: team_media
 data:
-  form_submission:
-    class: FormSubmission
-    base: id_resource
+  team_media:
+    class: TeamMedia
+    base: team_media_collection
     id_fields:
+    - team_media_collection
     - external_id
-    - portal_name
     key: id
     api: true
-    display: <portal_name>:<external_id>
+    display: '<id>: <hash>'
     roles:
       edit:
       - data-admin
       view:
       - data-auditor
     fields:
-      portal_name:
-        type: '@django.CharField'
-        options:
-          'null': true
-          default: null
-          choices: null
-          max_length: 100
-          editable: true
-          primary_key: false
-          system: false
-      session_id:
-        type: '@django.CharField'
-        options:
-          'null': true
-          default: null
-          choices: null
-          max_length: 50
-          editable: true
-          primary_key: false
-          system: false
-      name:
-        type: '@django.CharField'
-        options:
-          'null': true
-          default: null
-          choices: null
-          max_length: 255
-          editable: true
-          primary_key: false
-          system: false
-      nav_path:
-        type: '@django.CharField'
-        options:
-          'null': true
-          default: null
-          choices: null
-          max_length: 1024
-          editable: true
-          primary_key: false
-          system: false
       external_id:
         type: '@django.CharField'
         options:
           'null': true
           default: null
           choices: null
-          max_length: 50
+          max_length: 256
           editable: true
           primary_key: false
           system: false
-      fields:
+      description:
+        type: '@django.TextField'
+        options:
+          'null': true
+          default: null
+          editable: true
+          system: false
+      content:
+        type: '@django.TextField'
+        options:
+          'null': true
+          default: null
+          editable: true
+          system: false
+      topics:
         type: '@zimagi.DictionaryField'
         color: json
         options:
           editable: true
           system: false
-      path:
+      hash:
         type: '@django.CharField'
         options:
           'null': true
           default: null
           choices: null
-          max_length: 1024
+          max_length: 65
           editable: true
           primary_key: false
           system: false
-      page:
-        type: '@zimagi.DictionaryField'
+      type:
+        type: '@django.CharField'
+        options:
+          'null': false
+          default: file
+          choices: null
+          max_length: 256
+          editable: true
+          primary_key: false
+          system: false
+      sentences:
+        type: '@zimagi.ListField'
         color: json
         options:
           editable: true
           system: false
     meta:
       unique_together:
+      - team_media_collection
       - external_id
-      - portal_name
       ordering:
       - id

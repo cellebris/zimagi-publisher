@@ -1,7 +1,11 @@
 command_mixins:
+    team_media_collector:
+        class: TeamMediaCollectorCommandMixin
+        mixins: [browser, ml, portal, team_media]
+
     publisher:
         class: PublisherCommandMixin
-        mixins: [ml, team_summary, form_submission]
+        mixins: [ml, team_summary, form_submission, team_media_collector]
         parameters:
             topic:
                 parser: variable
@@ -27,6 +31,11 @@ command_base:
 command:
     portal:
         event:
+            media_collection:
+                base: portal_event
+                mixins: [publisher]
+                worker_type: publisher
+
             form_submission:
                 base: portal_event
                 mixins: [publisher]

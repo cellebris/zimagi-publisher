@@ -1,4 +1,5 @@
 plugin:
     qdrant_collection:
         providers:
+            team_media:
             web_component:

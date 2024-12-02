@@ -196,7 +196,9 @@ class PublisherCommandMixin(CommandMixin("publisher")):
         for name, score_info in sorted(
             scores.items(), key=lambda x: x[1]["score"], reverse=True
         ):
-            components.append({"name": name, "score": score_info["score"]})
+            components.append(
+                {"type": self.data_dir, "name": name, "score": score_info["score"]}
+            )
 
         return components
 

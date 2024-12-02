@@ -6,6 +6,50 @@ _base_model: &base_model
     priority: 60
 
 models:
+    team_media_collection:
+        <<: *base_model
+        base: team
+        plural: team_media_collections
+        id_fields: [team, external_id]
+        key: external_id
+        display: "<external_id>: <name>"
+        priority: 70
+        fields:
+            external_id:
+                type: string
+            description:
+                type: text
+            access_teams:
+                type: list
+
+    team_media:
+        <<: *base_model
+        base: team_media_collection
+        plural: team_medias
+        id_fields: [team_media_collection, external_id]
+        key: id
+        display: "<id>: <hash>"
+        priority: 75
+        fields:
+            external_id:
+                type: string
+            type:
+                type: string
+                options:
+                    default: file
+            description:
+                type: text
+            hash:
+                type: string
+                options:
+                    max_length: 65
+            content:
+                type: text
+            sentences:
+                type: list
+            topics:
+                type: dict
+
     form_submission:
         <<: *base_model
         plural: form_submissions
