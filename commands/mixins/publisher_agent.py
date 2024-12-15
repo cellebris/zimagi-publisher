@@ -7,11 +7,11 @@ import re
 class PublisherAgentCommandMixin(CommandMixin("publisher_agent")):
 
     def exec(self):
-        input_channel = "agent:publish"
-
         self.save_component_embeddings()
 
-        for package in self.listen(input_channel):
+        for package in self.listen(
+            self.publish_channel, state_key=self.publish_channel_key
+        ):
             try:
                 self.data("Processing publishing request", package.sender)
                 response = self.profile(self._publish_component, package.message)
@@ -19,11 +19,11 @@ class PublisherAgentCommandMixin(CommandMixin("publisher_agent")):
                     self.send(package.sender, response.result)
 
             except Exception as e:
-                self.send(input_channel, package.message, package.sender)
+                self.send(self.publish_channel, package.message, package.sender)
                 raise e
 
             self.send(
-                f"{input_channel}:stats",
+                f"{self.publish_channel}:stats",
                 {
                     "data_dir": self.data_dir,
                     "message": package.message,
@@ -34,11 +34,10 @@ class PublisherAgentCommandMixin(CommandMixin("publisher_agent")):
 
     def _publish_component(self, message):
         query = message["fields"]["user-query"]
+        components = []
         component_info = None
 
-        components = self.search_components(
-            query, sentence_limit=sentence_limit, min_score=0.3
-        )
+        components = self.search_components(query, sentence_limit=50, min_score=0.3)
         if components:
             component_info = {
                 "type": self.data_dir,
@@ -52,12 +51,15 @@ class PublisherAgentCommandMixin(CommandMixin("publisher_agent")):
         )
 
         if True:  # normalized_score <= self.max_component_generation_score:
-            component = self.generate_component(
-                query, message["portal_name"], message["fields"]["search-project"]
-            )
-            component_info = {
-                "type": self.data_dir,
-                "name": self.save_component(component),
-                "score": 0,
-            }
-        return component_info
+            for project in self.search_projects(message["portal_name"], query):
+                component = self.generate_component(
+                    query, message["portal_name"], project.id
+                )
+                components.append(
+                    {
+                        "type": self.data_dir,
+                        "name": self.save_component(component),
+                        "score": 0,
+                    }
+                )
+        return components

@@ -5,7 +5,13 @@ command_mixins:
 
     publisher:
         class: PublisherCommandMixin
-        mixins: [ml, team_summary, form_submission, team_media_collector]
+        mixins:
+            [
+                ml,
+                team_summary,
+                form_submission,
+                team_media_collector team_document_collection,
+            ]
         parameters:
             topic:
                 parser: variable
@@ -19,7 +25,21 @@ command_mixins:
                 type: str
                 optional: false
                 help: "Top level data directory for reading and generating components"
-                value_label: filepath
+                value_label: FILEPATH
+                tags: [publisher]
+            publish_channel:
+                parser: variable
+                type: str
+                optional: false
+                help: "Publisher listen channel"
+                value_label: NAME
+                tags: [publisher]
+            publish_channel_key:
+                parser: variable
+                type: str
+                optional: false
+                help: "Publisher listen channel state key"
+                value_label: NAME
                 tags: [publisher]
 
 command_base:

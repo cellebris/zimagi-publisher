@@ -1,7 +1,7 @@
 from django.conf import settings
 
 from systems.commands.index import CommandMixin
-from utility.data import load_yaml
+from utility.data import Collection, load_yaml, load_json, dump_json
 from utility.filesystem import load_file, save_yaml
 from utility.git import Git
 from utility.topics import TopicModel
@@ -9,6 +9,7 @@ from utility.topics import TopicModel
 from bs4 import BeautifulSoup
 import os
 import re
+import statistics
 
 
 class PublisherCommandMixin(CommandMixin("publisher")):
@@ -71,21 +72,21 @@ class PublisherCommandMixin(CommandMixin("publisher")):
         portal_name,
         project_id,
         prompt,
+        output_format="Generate the data object in JSON format.",
         max_sections=5,
         sentence_limit=50,
         retries=0,
     ):
         summary = self.generate_project_summary(
-            self._team_project.retrieve(project_id, team__portal_name=portal_name),
+            self._team_project.retrieve_by_id(project_id),
             prompt,
             use_default_format=False,
-            output_format="Generate the data object in YAML format like the following examples and end the response with the [end] tag.",
-            output_endings=["[end]"],
+            output_format=output_format,
+            output_endings=["}"],
             max_sections=max_sections,
             sentence_limit=sentence_limit,
         )
-        yaml_data = re.search("(.*)\[end\]", summary.text, re.DOTALL)
-        if not yaml_data:
+        if not summary.text:
             if retries > 0:
                 return self.generate_data(
                     portal_name,
@@ -96,7 +97,95 @@ class PublisherCommandMixin(CommandMixin("publisher")):
                     retries=(retries - 1),
                 )
             return None
-        return load_yaml(yaml_data.group(1).strip())
+        return load_json(summary.text.strip())
+
+    def search_projects(
+        self,
+        portal_name,
+        search_text,
+        sentence_limit=100,
+        project_limit=2,
+        min_score=0.5,
+    ):
+        topic_parser = TopicModel()
+        search_topics = topic_parser.parse(search_text)
+        scores = {}
+        project_index = {}
+        projects = []
+
+        search = self.generate_text_embeddings(search_text, validate=False)
+        sentence_rankings = self.search_embeddings(
+            "team_document",
+            search.embeddings,
+            limit=sentence_limit,
+            fields=["collection_id", "document_id", "topics"],
+            min_score=min_score,
+        )
+        for index, ranking in enumerate(sentence_rankings):
+            for ranking_index, sentence_info in enumerate(ranking):
+                sentence = sentence_info.payload["sentence"].strip()
+                collection_id = sentence_info.payload["collection_id"]
+                document_id = sentence_info.payload["document_id"]
+                topic_score = topic_parser.get_topic_score(
+                    search_topics, sentence_info.payload["topics"]
+                )
+
+                if self.debug and self.verbosity > 2:
+                    self.data(f"{collection_id}: {sentence}", sentence_info.score)
+
+                if collection_id not in scores:
+                    scores[collection_id] = {"count": 0, "score": 0}
+
+                scores[collection_id]["count"] += 1
+                scores[collection_id]["score"] += (
+                    1 + topic_score
+                ) * sentence_info.score
+
+        for collection_id, score_info in sorted(
+            scores.items(), key=lambda x: x[1]["score"], reverse=True
+        ):
+            collection = self._team_document_collection.retrieve_by_id(collection_id)
+            for project in collection.team_project.filter(
+                team__portal_name=portal_name
+            ):
+                if project.id not in project_index:
+                    project_index[project.id] = [score_info["score"]]
+                else:
+                    project_index[project.id].append(score_info["score"])
+
+        for project_id, scores in project_index.items():
+            project_index[project_id] = statistics.mean(scores)
+
+        for project_id, score in sorted(
+            project_index.items(), key=lambda x: x[1], reverse=True
+        ):
+            projects.append(
+                Collection(
+                    id=project_id,
+                    score=score,
+                )
+            )
+            if not project_limit or len(projects) == project_limit:
+                break
+        return projects
+
+    def generate_queries(self, query, portal_name, project_id):
+        prompt = (
+            "Generate sub-queries that if answered would provide valuable information "
+            f"for understanding the subject in the following query: '{query}'"
+            ""
+            "Adhere to the following JSON data structure: "
+            ""
+            '{"queries": ["query", "query", "query"]}'
+        )
+        data = self.generate_data(
+            portal_name,
+            project_id,
+            prompt,
+            sentence_limit=10,
+            max_sections=1,
+        )
+        return data["queries"]
 
     def generate_component(self, query, portal_name, project_id):
         instructions = load_file(f"{self.data_path}/README.md")
@@ -109,7 +198,7 @@ class PublisherCommandMixin(CommandMixin("publisher")):
             "Adhere to the following instructions written in markdown when creating the data card:\n\n{}".format(
                 instructions
             ),
-            "Use the following YAML data cards as examples when generating a new data card:\n\nFirst data card example:\n\n{}".format(
+            "Use the following JSON data cards as examples when generating a new data card:\n\nFirst data card example:\n\n{}".format(
                 "\n\nNext data card example:\n\n".join(examples)
             ),
         ]
@@ -132,7 +221,7 @@ class PublisherCommandMixin(CommandMixin("publisher")):
                     ",\n".join(self.get_component_names())
                 ),
                 provider="mixtral_7bx8",
-                prompt="Generate a single path name that does not exist in the example list consisting only of alpha-numeric characters, underscores, and forward slashes  that focuses on effective categorization to represent the following component information:\n\n{}".format(
+                prompt="Generate only one path name that does not exist in the example list consisting only of alpha-numeric characters, underscores, and forward slashes without any escape characters to represent the following component information:\n\n{}".format(
                     "\n\n".join(component_statements)
                 ),
                 output_format="Answer with only the path name and place the path name between [start] and [end] tags",
@@ -145,7 +234,7 @@ class PublisherCommandMixin(CommandMixin("publisher")):
 
             path_name = re.search("\[start\](.*)\[end\]", summary.text)
             if path_name:
-                path_name = path_name.group(1).strip()
+                path_name = path_name.group(1).strip().replace("\\", "")
             elif index < retries:
                 index += 1
             else:
@@ -207,11 +296,11 @@ class PublisherCommandMixin(CommandMixin("publisher")):
         for component in self.search_components(
             search_text, sentence_limit=sentence_limit, min_score=0
         ):
-            components.append(
-                load_file(os.path.join(self.data_path, component["name"] + ".yaml"))
-            )
-            if len(components) == count:
-                break
+            data = load_file(os.path.join(self.data_path, component["name"] + ".yaml"))
+            if data:
+                components.append(dump_json(load_yaml(data), indent=2))
+                if len(components) == count:
+                    break
 
         return components
 

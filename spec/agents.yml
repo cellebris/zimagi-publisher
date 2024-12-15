@@ -11,6 +11,8 @@ command_base:
         worker_type: publisher
         parse:
             - data_dir
+            - publish_channel
+            - publish_channel_key
 
 command:
     agent:
@@ -20,49 +22,67 @@ command:
                 mixins: [publisher_agent]
                 options:
                     data_dir: "src/data/headers"
+                    publish_channel: "agent:publish"
+                    publish_channel_key: header_publisher
 
             banner:
                 base: publisher_agent
                 mixins: [publisher_agent]
                 options:
                     data_dir: "src/data/banners"
+                    publish_channel: "agent:publish"
+                    publish_channel_key: banner_publisher
 
             note:
                 base: publisher_agent
                 mixins: [publisher_agent]
                 options:
                     data_dir: "src/data/notes"
+                    publish_channel: "agent:publish"
+                    publish_channel_key: note_publisher
 
             stats:
                 base: publisher_agent
                 mixins: [publisher_agent]
                 options:
                     data_dir: "src/data/stats"
+                    publish_channel: "agent:publish"
+                    publish_channel_key: stats_publisher
 
             component:
                 base: publisher_agent
                 mixins: [publisher_agent]
                 options:
                     data_dir: "src/data/components"
+                    publish_channel: "agent:publish_component"
+                    publish_channel_key: component_publisher
 
             cta:
                 base: publisher_agent
                 mixins: [publisher_agent]
                 options:
                     data_dir: "src/data/cta"
+                    publish_channel: "agent:publish"
+                    publish_channel_key: cta_publisher
 
             faq:
                 base: publisher_agent
                 mixins: [publisher_agent]
                 options:
                     data_dir: "src/data/faq"
+                    publish_channel: "agent:publish"
+                    publish_channel_key: faq_publisher
 
         assistant:
             base: publisher_agent
             options:
                 data_dir: "src/data/forms"
+                publish_channel: "agent:publish"
+                publish_channel_key: faq_publisher
 
         editor:
             base: publisher_agent
             options:
                 data_dir: "src/data/nav"
+                publish_channel: "agent:form_submissions:update"
+                publish_channel_key: publisher_editor
