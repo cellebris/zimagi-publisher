@@ -7,6 +7,6 @@ scripts: scripts/install.sh
 requirements: requirements.txt
 
 modules:
-    - provider: github
-      remote: fractalsynapse/nexical-core-engine
+    - provider: git
+      remote: https://github.com/fractalsynapse/nexical-core-engine.git
       reference: main
